@@ -49,10 +49,11 @@
 		<title>MobileTools</title>
 		<content>MobileTools.swf</content>
 		<visible>true</visible>
-		<fullScreen>true</fullScreen>
-		<!--<autoOrients>false</autoOrients>-->
+		<fullScreen>false</fullScreen>
+		<autoOrients>false</autoOrients>
 		<!--<aspectRatio>landscape</aspectRatio>-->
 		<renderMode>direct</renderMode>
+		<systemChrome>standard</systemChrome>
 		<!--<depthAndStencil>true</depthAndStencil>--> <!-- required for 3D -->
 	</initialWindow>
 	

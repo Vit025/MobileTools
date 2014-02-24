@@ -4,6 +4,8 @@ package com.tessmann.gui
 	import flash.display.Sprite;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
+	import flash.text.TextFormat;
+	import flash.utils.getTimer;
 	/**
 	 * ...
 	 * @author Vitaly Filinov @ TELEFISION TEAM
@@ -21,6 +23,7 @@ package com.tessmann.gui
 		
 		public function draw(data:Object, bitmapData:BitmapData):void
 		{
+			//var t1:int = getTimer();
 			if (!textField)
 			{
 				createElements();
@@ -39,13 +42,17 @@ package com.tessmann.gui
 			a = (bitmapData.height - textField.height) >> 1;
 			textField.y = (a > 0)? (a + .5) >> 0 : (a - .5) >> 0;
 			
-			bitmapData.draw(container);
+			bitmapData.draw(container, null, null, null, null, true);
+			//var t2:int = getTimer();
+			//trace("----", t2 - t1);
 		}
 		
 		private function createElements():void 
 		{
 			textField = new TextField();
-			textField.textColor = 0xFFFFFF;
+			
+			var format:TextFormat = new TextFormat("SegoeUI", 24, 0xFFFFFF);
+			textField.defaultTextFormat = format;
 			
 			container = new Sprite();
 			container.addChild(textField);

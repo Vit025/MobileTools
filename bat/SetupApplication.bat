@@ -8,7 +8,7 @@
 
 :: Android packaging
 set AND_CERT_NAME="MobileTools"
-set AND_CERT_PASS=fd
+set AND_CERT_PASS=grtp015
 set AND_CERT_FILE=cert\MobileTools.p12
 set AND_ICONS=icons/android
 

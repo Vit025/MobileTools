@@ -7,7 +7,7 @@
     <movie path="bin\MobileTools.swf" />
     <movie fps="30" />
     <movie width="480" />
-    <movie height="762" />
+    <movie height="800" />
     <movie version="3" />
     <movie minorVersion="8" />
     <movie platform="AIR Mobile" />
@@ -16,7 +16,6 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="D:\work\AS3_STANDARTS" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -54,6 +53,7 @@
   <!-- SWC Libraries -->
   <libraryPaths>
     <element path="D:\work\AS3_STANDARTS\greensock.swc" />
+    <element path="libs\greensock.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

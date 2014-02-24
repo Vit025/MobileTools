@@ -6,9 +6,17 @@ package com.tessmann.gui
 	import flash.display.Sprite;
 	import flash.display3D.textures.RectangleTexture;
 	import flash.errors.IllegalOperationError;
+	import flash.events.DataEvent;
 	import flash.events.Event;
+	import flash.events.GestureEvent;
 	import flash.events.MouseEvent;
+	import flash.events.TouchEvent;
+	import flash.events.TransformGestureEvent;
 	import flash.geom.Rectangle;
+	import flash.system.Capabilities;
+	import flash.ui.Multitouch;
+	import flash.ui.MultitouchInputMode;
+	import flash.utils.getTimer;
 	
 	/**
 	 * ...
@@ -40,8 +48,17 @@ package com.tessmann.gui
 		{
 			_countedY = -itemHeight;
 			
-			addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-			addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+			if (Multitouch.supportsTouchEvents)
+			{
+				Multitouch.inputMode = MultitouchInputMode.GESTURE;
+				addEventListener(TransformGestureEvent.GESTURE_SWIPE, onSwipe);
+				addEventListener(TransformGestureEvent.GESTURE_PAN, onPan);
+			}
+			else
+			{
+				addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+				addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+			}
 			
 			_viewBitmap = new Bitmap();
 			
@@ -51,6 +68,38 @@ package com.tessmann.gui
 			addChild(_viewBitmap);
 			
 			_data = [];
+		}
+		
+		private function onPan(e:TransformGestureEvent):void 
+		{
+			
+		}
+		
+		private function onTouchTap(e:TouchEvent):void 
+		{
+			dispatchEvent(new DataEvent("touch_tap_detected"));
+		}
+		
+		private function onSwipe(e:TransformGestureEvent):void 
+		{
+			try {
+				dispatchEvent(new DataEvent("swipe_detected", false, false, e.offsetX + "  " + e.offsetY + " " + e.phase));
+				if (e.offsetY == 1)
+				{
+					countedYTo = countedY + (stage.stageHeight << 1);
+				}
+				else if (e.offsetY == -1)
+				{
+					countedYTo = countedY - (stage.stageHeight << 1);
+				}
+				
+				TweenLite.killTweensOf(this);
+				TweenLite.to(this, 60, { useFrames:true, countedY:countedYTo } );
+			} catch (err:Error)
+			{
+				dispatchEvent(new DataEvent("error_detected", false, false, err.message));
+			}
+
 		}
 		
 		private function onMouseDown(e:MouseEvent):void 
@@ -72,7 +121,7 @@ package com.tessmann.gui
 			}
 			
 			TweenLite.killTweensOf(this);
-			TweenLite.to(this, 10, { useFrames:true, countedY:countedYTo } );
+			TweenLite.to(this, 20, { useFrames:true, countedY:countedYTo } );
 		}
 		
 		public function set countedY(value:Number):void
@@ -115,7 +164,10 @@ package com.tessmann.gui
 		private function updateSize():void
 		{
 			_viewBitmap.bitmapData = new BitmapData(_width, _height + (itemHeight << 1), false, 0x222120);
+			_viewBitmap.smoothing = true;
+			_viewBitmap.bitmapData.lock();
 			_rendererBitmapData = new BitmapData(_width, itemHeight, true, 0);
+			_rendererBitmapData.lock();
 			_rendererPixels = _rendererBitmapData.getVector(new Rectangle(0, 0, _width, itemHeight));
 			
 			visibleCount = _height / itemHeight + 2;
@@ -126,23 +178,31 @@ package com.tessmann.gui
 		
 		private function redraw():void
 		{
+			
 			if (!_data) {
 				return;
 			}
 			
+			//var t1:int = getTimer();
+			
 			var imax:int = position - 1 + visibleCount + 2;
 			_viewPixels = Vector.<uint>([]);
 			
-			_renderer ||= new BitmapItemRenderer();
-			for (i = 0; i < imax; i++)
+			var r0:Rectangle = new Rectangle(0, 0, _width, itemHeight - 1);
+			var r1:Rectangle = new Rectangle(0, 0, _width, itemHeight);
+			var r2:Rectangle = new Rectangle(0, 0, _width, itemHeight);
+			var _y:int = 0;
+				
+			for (i = position; i < imax; i++)
 			{
-				_rendererBitmapData.setVector(new Rectangle(0, 0, _width, _height), _rendererPixels);
+				_rendererBitmapData.fillRect(r0, 0xFFCCCCCC);
 				_renderer.draw(_data[position + i], _rendererBitmapData);
-				var pix:Vector.<uint> = _rendererBitmapData.getVector(new Rectangle(0, 0, _width, itemHeight));
-				//_viewPixels.splice(0, 0, pix);
-				_viewPixels = _viewPixels.concat(pix);
+				r2.y = _y;
+				_viewBitmap.bitmapData.setVector(r2, _rendererBitmapData.getVector(r1));
+				_y += itemHeight;
 			}
-			_viewBitmap.bitmapData.setVector(new Rectangle(0, 0, _width, _height), _viewPixels);
+				//var t2:int = getTimer();
+				//trace(t2 - t1);
 		}
 		
 		override public function get width():Number 
