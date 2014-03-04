@@ -17,6 +17,8 @@ package
 	 * ...
 	 * @author Vitaly Filinov @ TELEFISION TEAM
 	 */
+	 
+	 
 	public class Main extends Sprite 
 	{
 		private var console:TextField;
